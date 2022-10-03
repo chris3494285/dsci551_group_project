@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>任务调度列表</title>
+  <script src="js/jquery-1.11.1-min.js" type="text/javascript"></script>
+
+<!--  boostrap-->
+  <link rel="stylesheet" type="text/css" href="jquery/bootstrap_3.3.0/css/bootstrap.min.css">
+  <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+
+<!--  分页插件-->
+  <link rel="stylesheet" type="text/css" href="jquery/bs_pagination-master/css/jquery.bs_pagination.min.css">
+  <script type="text/javascript" src="jquery/bs_pagination-master/js/jquery.bs_pagination.min.js"></script>
+  <script type="text/javascript" src="jquery/bs_pagination-master/localization/en.js"></script>
+  <script type="text/javascript">
+
+    // function printPartitionFiles(parentDir) {
+    //   $.ajax({
+    //     url: "",
+    //     data:{
+    //       parentDir:parentDir
+    //     },
+    //     dataType:'json',
+    //     success: function (ret) {
+    //       var str = ""
+    //     }
+    //
+    //   })
+    // }
+
+    function goClick() {
+      var input = document.getElementById("directory").value
+      //window.alert(input)
+
+      $.ajax({
+        url: "/project/query/partitionFile",
+        data:{
+          input:input
+        },
+        dataType:'json',
+        success: function (ret) {
+          window.alert(ret.status)
+          var str = ""
+          $.each(ret.partitionContent,function (index,n) {
+
+            str += "<p>"+ n+"</p>"
+          });
+          $("#file-info-blockinfo-body").html(str);
+
+        },
+        error: function () {
+          alert("error");
+        }
+
+      })
+      // var str = " <p>Block ID: 1073741897</p>" +
+      //         "<p>Block Pool ID: BP-611089001-192.168.10.102-1656250729240</p>" +
+      //         "<p>Generation Stamp: 1073</p>" +
+      //         "<p>Size: 112</p>"
+      //
+      // $("#file-info-blockinfo-body").html(str);
+    }
+
+  </script>
+</head>
+<body style="text-align:center;">
+
+<style type="text/css">
+
+  .button1 {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    padding: 16px 32px;
+    text-align: center;
+    background-color: white;
+    color: black;
+    border: 2px solid #4c77af;
+    border-radius:5px;
+  }
+  .button1:hover {
+    background-color: #4c77af;
+    color: white;
+  }
+  .button2 {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    padding: 8px 16px;
+    text-align: center;
+    background-color: white;
+    color: black;
+    border: 2px solid #4c77af;
+    border-radius:5px;
+  }
+  .button2:hover {
+    background-color: #4c77af;
+    color: white;
+  }
+
+  .button3 {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    padding: 8px 16px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.36);
+    color: black;
+    border: 2px solid #4c77af;
+    border-radius:5px;
+  }
+
+  .longText{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    width: 100px;
+  }
+
+  .longText:hover{
+    overflow:auto;
+    text-overflow:clip;
+  }
+
+</style>
+
+
+<div>
+
+  <div style="position: relative; left: 10px; top: -10px;">
+    <div class="page-header" >
+      <h3>EDFS</h3>
+<!--      <button type="button" class="btn btn-primary" >test</button>-->
+    </div>
+  </div>
+
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-10 col-md-10">
+      <form onsubmit="return false;">
+        <div class="input-group">
+          <input type="text" class="form-control" id="directory"/>
+          <span class="input-group-btn">
+                <button class="btn btn-default" type="button" id="btn-nav-directory" onclick="goClick()">Go!</button>
+              </span>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-2 col-md-2">
+      <button type="button" class="btn btn-default" data-toggle="modal"
+              aria-label="New Directory" data-target="#btn-create-directory"
+              title="Create Directory" id="btn-create-dir">
+        <span class="glyphicon glyphicon-folder-open"></span>
+      </button>
+      <button type="button" class="btn btn-default" data-toggle="modal"
+              data-target="#modal-upload-file" title="Upload Files" id="btn-upload-files">
+        <span class="glyphicon glyphicon-cloud-upload"></span>
+      </button>
+      <button class="btn btn-default dropdown-toggle" type="button"
+              data-toggle="dropdown" title="Cut & Paste">
+        <span class="glyphicon glyphicon-list-alt"></span></button>
+      <ul class="dropdown-menu cut-paste">
+        <li><a id="explorer-cut">Cut</a></li>
+        <li><a id="explorer-paste">Paste</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-10 col-md-10">
+      <div class="panel-body" id="file-info-blockinfo-body">
+        <!--<p>Block ID: 1073741897</p>-->
+        <!--<p>Block Pool ID: BP-611089001-192.168.10.102-1656250729240</p>-->
+        <!--<p>Generation Stamp: 1073</p>-->
+        <!--<p>Size: 112</p>-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-2" style="top: 10px;text-align: center">
+
+  <!--<table class="table table-hover" style="table-layout: fixed;word-break: break-all;">-->
+    <!--<tbody id="tBody" style="font-size: 20px;">-->
+    <!--<div class="panel-body" id="file-info-blockinfo-body">-->
+      <!--<p>Block ID: 1073741897</p>-->
+      <!--<p>Block Pool ID: BP-611089001-192.168.10.102-1656250729240</p><p>Generation Stamp: 1073</p>-->
+      <!--<p>Size: 112</p>-->
+    <!--</div>-->
+    <!--</tbody>-->
+  <!--</table>-->
+
+
+  <div id="info_details"></div>
+</div >
+
+</body>
+</html>

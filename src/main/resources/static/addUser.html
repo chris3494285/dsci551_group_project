@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>任务调度列表</title>
+  <script src="js/jquery-1.11.1-min.js" type="text/javascript"></script>
+
+<!--  boostrap-->
+  <link rel="stylesheet" type="text/css" href="jquery/bootstrap_3.3.0/css/style.css">
+  <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+
+<!--  分页插件-->
+  <link rel="stylesheet" type="text/css" href="jquery/bs_pagination-master/css/jquery.bs_pagination.min.css">
+  <script type="text/javascript" src="jquery/bs_pagination-master/js/jquery.bs_pagination.min.js"></script>
+  <script type="text/javascript" src="jquery/bs_pagination-master/localization/en.js"></script>
+  <script type="text/javascript">
+
+    function login() {
+      //获取用户输入的表单信息
+
+      var userId = $.trim($("#userId").val());
+      var userName = $.trim($("#userName").val());
+      var loginPassword = $.trim($("#loginPassword").val());
+      var adminloginPassword = $.trim($("#adminloginPassword").val());
+
+        $.ajax({
+          url:"/offline-sync/controller/insert/user",
+          type:"post",
+          data:{
+            "userId":userId,
+            "userName":userName,
+            "loginPassword":loginPassword,
+            "adminloginPassword":adminloginPassword
+          },
+          success:function (jsonObject) {
+
+            if (jsonObject.errorMsg == "OK") {
+              window.alert("用户添加成功")
+            } else {
+              window.alert(jsonObject.errorMsg)
+            }
+
+            $("#userId").val("")
+            $("#userName").val("")
+            $("#loginPassword").val("")
+            $("#adminloginPassword").val("")
+
+          },
+          error:function () {
+            window.alert("系统繁忙，请稍后重试...")
+          }
+        });
+      //}
+
+    }
+
+  </script>
+</head>
+<body style="text-align:center;">
+
+<style type="text/css">
+
+  .main{
+    text-align: center; /*让div内部文字居中*/
+    border-radius: 20px;
+    width: 300px;
+    height: 350px;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+</style>
+
+
+<div class="main">
+
+
+      <div class="login-cnt clearfix">
+        <div class="login-form">
+          <h2>新添用户</h2>
+
+          <div class="login-box clearfix"style="z-index:8; padding-bottom:0px;">
+            <label>用户ID</label>
+            <input id="userId" name="userId" type="text" class="input_text" placeholder="输入用户ID" />
+          </div>
+
+          <div class="login-box clearfix" style="z-index:8; padding-bottom:0px;">
+            <label>用户名</label>
+            <input id="userName" name="userName" type="text" class="input_text" placeholder="输入用户中文名"  />
+          </div>
+
+          <div class="login-box clearfix" style="z-index:8; padding-bottom:0px;">
+            <label>密码</label>
+            <input id="loginPassword" name="loginPassword" type="password" placeholder="请输入登录密码" class="input_text" />
+          </div>
+
+          <div class="login-box clearfix" style="z-index:8; padding-bottom:0px;">
+            <label>管理员密码</label>
+            <input id="adminloginPassword" name="adminloginPassword" type="password" placeholder="请输入管理员密码" class="input_text"/>
+          </div>
+
+<!--          <div class="login-yzm">-->
+<!--            <ul>-->
+<!--              <li id="showId"-->
+<!--                  style="color:red;font-size:12px;width:222px;margin-top:10px;margin-bottom:10px;line-height:18px;"></li>-->
+<!--            </ul>-->
+<!--          </div>-->
+
+<!--          <%&#45;&#45;<div class="login-yzm">-->
+<!--          <div id="showCaptcha" class="yzm-box" style="display:block;">-->
+<!--            <input id="captcha" type="text" class="yzm" placeholder="点击右侧图片可刷新" onblur="checkCaptcha();"/>-->
+<!--            <img src="${pageContext.request.contextPath}/jcaptcha/captcha" alt="图片看不清？点击重新得到验证码" id="imgCode" onclick="this.src='${pageContext.request.contextPath}/jcaptcha/captcha?d='+new Date().getTime()" style="cursor:pointer;border:0; display:inline;vertical-align:middle;"/>-->
+<!--          </div>-->
+<!--          <ul><li id="showId2" style="color:red;font-size:12px;width:222px;margin-top:10px;margin-bottom:10px;line-height:18px;"></li></ul>-->
+<!--        </div>&#45;&#45;%>-->
+          <div class="bn-login" id="loginId"><button onclick="login()">添加</button></div>
+        </div>
+  </div>
+
+</div>
+
+<!--<div style="position: relative;top: 10px; width: 20%;float: left">-->
+<!--  <table class="table table-hover" style="table-layout: fixed;word-break: break-all">-->
+<!--    <thead>-->
+<!--    <tr style="color: #B3B3B3; font-size: 20px">-->
+<!--      <td>操控台</td>-->
+<!--    </tr>-->
+<!--    </thead>-->
+<!--    <tbody id="tBody2" style="font-size: 15px;">-->
+<!--    </tbody>-->
+<!--  </table>-->
+<!--</div>-->
+</body>
+</html>

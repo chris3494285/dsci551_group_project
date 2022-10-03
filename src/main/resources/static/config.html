@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>任务调度列表</title>
+  <script src="js/jquery-1.11.1-min.js" type="text/javascript"></script>
+
+<!--  boostrap-->
+  <link rel="stylesheet" type="text/css" href="jquery/bootstrap_3.3.0/css/bootstrap.min.css">
+  <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+
+<!--  分页插件-->
+  <link rel="stylesheet" type="text/css" href="jquery/bs_pagination-master/css/jquery.bs_pagination.min.css">
+  <script type="text/javascript" src="jquery/bs_pagination-master/js/jquery.bs_pagination.min.js"></script>
+  <script type="text/javascript" src="jquery/bs_pagination-master/localization/en.js"></script>
+  <script type="text/javascript">
+
+    syncWay = ""
+    scheduleCycle = ""
+    index_left = 0;
+    index_right = 0;
+<!--    更新按钮点击-->
+    function updateConfigBtn(configId){
+
+      $.ajax({
+        url: "/offline-sync/controller/query/config",
+        type: "post",
+        data: {
+          id: configId
+        },
+        dataType: "json",
+        success: function (data) {
+          if (data != null) {
+
+            $("#edit-confId").val(configId)
+            $("#edit-databaseName").val(data.databaseName)
+            $("#edit-zgHdfsPath").val(data.zgHdfsPath)
+            $("#edit-syncWay").val(data.syncWay)
+            $("#edit-scheduleCycle").val(data.scheduleCycle)
+            $("#edit-zijieyunHdfsPath").val(data.zijieyunHdfsPath)
+            $("#edit-isDelete").val(data.isDelete)
+            $("#edit-zgIp").val(data.zgIp)
+            $("#edit-proxyIp").val(data.proxyIp)
+            $("#edit-zijieyunIp").val(data.zijieyunIp)
+            $("#editConfig").modal("show");
+
+          } else {
+            alert("无相关配置");
+          }
+        },
+        error: function () {
+          alert("错误：配置查询失败");
+        }
+      })
+    }
+
+    //更新数据库
+    function updateConfig(){
+
+      var conf_id  = document.getElementById("edit-confId").value;
+      var database_name  = document.getElementById("edit-databaseName").value;
+      var zg_hdfs_path  = document.getElementById("edit-zgHdfsPath").value;
+      var sync_way_origin  = document.getElementById("edit-syncWay");
+      var sync_way = sync_way_origin.options[sync_way_origin.selectedIndex].text;
+      var zg_ip  = document.getElementById("edit-zgIp").value;
+    
+      // var schedule_cycle_origin  = document.getElementById("edit-scheduleCycle");
+      // var schedule_cycle = schedule_cycle_origin.options[schedule_cycle_origin.selectedIndex].text;
+
+      var schedule_cycle = document.getElementById("edit-scheduleCycle").value;
+
+      var proxy_ip  = document.getElementById("edit-proxyIp").value;
+      var zijieyun_ip  = document.getElementById("edit-zijieyunIp").value;
+      var zijieyun_hdfs_path  = document.getElementById("edit-zijieyunHdfsPath").value;
+      var is_delete  = document.getElementById("edit-isDelete").value;
+
+      $.ajax({
+        url: "/offline-sync/controller/update/config",
+        type: "post",
+        data: {
+          id: conf_id,
+          database_name: database_name,
+          zg_hdfs_path: zg_hdfs_path,
+          sync_way: sync_way,
+          zg_ip: zg_ip,
+          schedule_cycle: schedule_cycle,
+          proxy_ip: proxy_ip,
+          zijieyun_ip: zijieyun_ip,
+          zijieyun_hdfs_path: zijieyun_hdfs_path,
+          is_delete: is_delete
+        },
+        dataType: "json",
+        success: function (resp) {
+          if (resp.effectRows == 1) {
+            alert("数据更新成功");
+            $("#editConfig").modal("hide")
+            pageFilterImpl(1,$("#info_details").bs_pagination('getOption', 'rowsPerPage'));
+          } else {
+            alert("数据更新失败");
+          }
+        },
+        error: function () {
+          alert("数据更新请求发送失败");
+        }
+      })
+    }
+
+    //复制按钮点击
+    function copyConfigBtn(configId){
+
+      $.ajax({
+        url: "/offline-sync/controller/query/config",
+        type: "post",
+        data: {
+          id: configId
+        },
+        dataType: "json",
+        success: function (data) {
+          if (data != null) {
+
+            $("#copy-confId").val(configId)
+            $("#copy-databaseName").val(data.databaseName)
+            $("#copy-zgHdfsPath").val(data.zgHdfsPath)
+            $("#copy-syncWay").val(data.syncWay)
+            $("#copy-scheduleCycle").val(data.scheduleCycle)
+            $("#copy-zijieyunHdfsPath").val(data.zijieyunHdfsPath)
+            $("#copy-isDelete").val(data.isDelete)
+            $("#copy-zgIp").val(data.zgIp)
+            $("#copy-proxyIp").val(data.proxyIp)
+            $("#copy-zijieyunIp").val(data.zijieyunIp)
+            $("#copyConfig").modal("show");
+
+          } else {
+            alert("无相关配置");
+          }
+        },
+        error: function () {
+          alert("错误：配置查询失败");
+        }
+      })
+    }
+
+    //数据库插入复制并更改的数据
+    function copyConfig(){
+      var conf_id  = document.getElementById("copy-confId").value;
+      var database_name  = document.getElementById("copy-databaseName").value;
+
+      var zg_hdfs_path  = document.getElementById("copy-zgHdfsPath").value;
+      var sync_way_origin  = document.getElementById("copy-syncWay");
+      var sync_way = sync_way_origin.options[sync_way_origin.selectedIndex].text;
+      var zg_ip  = document.getElementById("copy-zgIp").value;
+
+      // var schedule_cycle_origin  = document.getElementById("copy-scheduleCycle");
+      // var schedule_cycle = schedule_cycle_origin.options[schedule_cycle_origin.selectedIndex].text;
+      var schedule_cycle = document.getElementById("copy-scheduleCycle").value;
+
+      var proxy_ip  = document.getElementById("copy-proxyIp").value;
+      var zijieyun_ip  = document.getElementById("copy-zijieyunIp").value;
+      var zijieyun_hdfs_path  = document.getElementById("copy-zijieyunHdfsPath").value;
+      var is_delete  = document.getElementById("copy-isDelete").value;
+
+      var validate_string = "btn click";
+      $.ajax({
+        url: "/offline-sync/controller/insert/config",
+        type: "post",
+        data: {
+          database_name: database_name,
+          zg_hdfs_path: zg_hdfs_path,
+          sync_way: sync_way,
+          zg_ip: zg_ip,
+          schedule_cycle: schedule_cycle,
+          proxy_ip: proxy_ip,
+          zijieyun_ip: zijieyun_ip,
+          zijieyun_hdfs_path: zijieyun_hdfs_path,
+          is_delete: is_delete,
+          validateString:validate_string
+        },
+        dataType: "json",
+        success: function (resp) {
+          if (resp.effectRows == 1) {
+            alert("数据更新成功");
+            $("#copyConfig").modal("hide")
+            pageFilterImpl(1,$("#info_details").bs_pagination('getOption', 'rowsPerPage'));
+          } else {
+            alert(resp.errorMsg);
+          }
+        },
+        error: function () {
+          alert("数据更新请求发送失败");
+        }
+      })
+    }
+
+    //新增数据按钮点击
+    function insertNewButton(){
+      $("#insertConfig").modal("show");
+    }
+
+    //数据库插入新增数据
+    function insertNew(){
+      var database_name  = document.getElementById("insert-databaseName").value;
+      var zg_hdfs_path  = document.getElementById("insert-zgHdfsPath").value;
+      var sync_way_origin  = document.getElementById("insert-syncWay");
+      var sync_way = sync_way_origin.options[sync_way_origin.selectedIndex].text;
+      var zg_ip  = document.getElementById("insert-zgIp").value;
+      // var schedule_cycle_origin  = document.getElementById("insert-scheduleCycle");
+      // var schedule_cycle = schedule_cycle_origin.options[schedule_cycle_origin.selectedIndex].text;
+      var schedule_cycle = document.getElementById("insert-scheduleCycle").value;
+      var proxy_ip  = document.getElementById("insert-proxyIp").value;
+      var zijieyun_ip  = document.getElementById("insert-zijieyunIp").value;
+      var zijieyun_hdfs_path  = document.getElementById("insert-zijieyunHdfsPath").value;
+      var is_delete  = document.getElementById("insert-isDelete").value;
+
+      var validate_string = "btn click";
+      $.ajax({
+        url: "/offline-sync/controller/insert/config",
+        data: {
+          database_name: database_name,
+          zg_hdfs_path: zg_hdfs_path,
+          sync_way: sync_way,
+          zg_ip: zg_ip,
+          schedule_cycle: schedule_cycle,
+          proxy_ip: proxy_ip,
+          zijieyun_ip: zijieyun_ip,
+          zijieyun_hdfs_path: zijieyun_hdfs_path,
+          is_delete: is_delete,
+          validateString:validate_string
+        },
+        dataType: "json",
+        success: function (resp) {
+          if (resp.effectRows == 1) {
+            alert("数据插入成功");
+            $("#insertConfig").modal("hide")
+            pageFilterImpl(1,$("#info_details").bs_pagination('getOption', 'rowsPerPage'));
+          } else {
+            alert(resp.errorMsg);
+          }
+        },
+        error: function () {
+          alert("数据插入请求发送失败");
+        }
+      })
+    }
+
+    //各项配置基础信息展示
+    function confInfo(confId){
+      $.ajax({
+        url: '/offline-sync/controller/query/config',
+        data: {
+          id: confId
+        },
+        dataType :"json",
+        success: function (data) {
+
+          $("#info-zgIp").val(data.zgIp)
+          $("#info-proxyIp").val(data.proxyIp)
+          $("#info-zijieyunIp").val(data.zijieyunIp)
+          $("#info-createTime").val(data.createTime)
+          $("#info-updateTime").val(data.updateTime)
+          
+          $("#showConfigInfo").modal("show");
+        }
+      })
+
+    }
+
+
+
+
+    //相关任务按钮点击
+    function relatedTaskBtn(confId) {
+      var linkHost = window.location.host
+
+      window.location.href = "http://" + linkHost +"/offline-sync/controller/task.html?confId=" +confId ;
+    }
+
+    //任务页转跳按钮
+    function referToTaskConfig(){
+      var linkHost = window.location.host
+
+      window.location.href = "http://" + linkHost +"/offline-sync/controller/task.html";
+    }
+
+    //分页功能
+    function pageFilterImpl(pageNo,pageSize) {
+
+      $.ajax({
+        url:'/offline-sync/controller/visit/config/pages',
+        //url:'/visit/task/pages',
+        data:{
+
+          pageNo:pageNo,
+          pageSize:pageSize,
+          syncWay: syncWay,
+          scheduleCycle: scheduleCycle
+        },
+        dataType:'json',
+        success:function (data) {
+
+          var str="";
+          index_left = (pageNo-1)*pageSize;
+          index_right = index_left + pageSize;
+          if (data.totalRows == 0){
+            str += '<tr>'
+            str += ("<td></td>>")
+            str += ("<td></td>>")
+            str += ("<td></td>>")
+            str += ("<td></td>>")
+
+            str += ("<td></td>>")
+            str += ("<td></td>>")
+            str += ("<td></td>>")
+            str += ("<td></td>")
+            str += ("<td></td>")
+            str += ("<td></td>")
+            str += ("<td></td>")
+            str += '</tr>'
+          } else {
+            $.each(data.configList,function (index,n) {
+
+              if (syncWay == '' && scheduleCycle == '') {
+                str += '<tr>'
+                str += ("<td>" + n.id + "</td>>")
+                str += ("<td class='longText' title='" + n.databaseName +"'>" + n.databaseName + "</td>>")
+                str += ("<td class='longText' title='" + n.zgHdfsPath +"'>" + n.zgHdfsPath + "</td>>")
+                str += ("<td>" + n.syncWay + "</td>>")
+                str += ("<td>" + n.scheduleCycle + "</td>>")
+                str += ("<td class='longText' title='"+ n.zijieyunHdfsPath +"'>" + n.zijieyunHdfsPath + "</td>")
+                str += ("<td>" + n.isDelete + "</td>>")
+                str += ("<td><button class='button2' onclick=\"confInfo("+n.id+")\">其他信息</button></td>")
+                str += ("<td><button class='button2' onclick=\"updateConfigBtn("+n.id+")\">更新</button></td>")
+                str += ("<td><button class='button2' onclick=\"relatedTaskBtn("+n.id+")\">相关任务</button></td>")
+                str += ("<td><button class='button2' onclick=\"copyConfigBtn("+n.id+")\">复制</button></td>")
+                str += '</tr>'
+              } else {
+                if (index >= index_left && index < index_right){
+                  str += '<tr>'
+                  str += ("<td>" + n.id + "</td>>")
+                  str += ("<td class='longText' title='" + n.databaseName +"'>" + n.databaseName + "</td>>")
+                  str += ("<td class='longText' title='" + n.zgHdfsPath +"'>" + n.zgHdfsPath + "</td>>")
+                  str += ("<td>" + n.syncWay + "</td>>")
+                  str += ("<td>" + n.scheduleCycle + "</td>>")
+                  str += ("<td class='longText' title='"+ n.zijieyunHdfsPath +"'>" + n.zijieyunHdfsPath + "</td>")
+                  str += ("<td>" + n.isDelete + "</td>>")
+                  str += ("<td><button class='button2' onclick=\"confInfo("+n.id+")\">其他信息</button></td>")
+                  str += ("<td><button class='button2' onclick=\"updateConfigBtn("+n.id+")\">更新</button></td>")
+                  str += ("<td><button class='button2' onclick=\"relatedTaskBtn("+n.id+")\">相关任务</button></td>")
+                  str += ("<td><button class='button2' onclick=\"copyConfigBtn("+n.id+")\">复制</button></td>")
+                  str += '</tr>'
+                }
+              }
+
+            });
+          }
+
+          $("#tBody").html(str);
+          var str3 = "<button type=\"button\" class=\"btn btn-primary\" onclick=\"insertNewButton()\"><span class=\"glyphicon glyphicon-plus\"></span>新增</button>";
+          var str4 = "<button type=\"button\" class=\"btn btn-primary\" style='margin-left: 10px' onclick=\"referToTaskConfig()\">任务页</button>";
+          $("#tBody").append(str3);
+          $("#tBody").append(str4);
+
+          //计算总页数
+          var totalPages=1;
+          if(data.totalRows%pageSize==0){
+            totalPages=data.totalRows/pageSize;
+          }else{
+            totalPages=parseInt(data.totalRows/pageSize)+1;
+          }
+
+          //当容器加载完成，并且市场活动的所有信息也都查询返回，对容器调用工具函数
+          $("#info_details").bs_pagination({
+            currentPage:pageNo,//当前页号，默认是1，相当于pageNo
+
+            rowsPerPage:pageSize,//每页显示条数，默认是10，相当于pageSize
+            totalRows:data.totalRows,//总条数，默认1000
+            totalPages:totalPages, //总页数.必填，手动计算。
+
+            visiblePageLinks:5,//每页最多显示的卡片数，默认是5
+
+            showGoToPage:true,//是否显示"跳转到"
+            showRowsPerPage:true,//是否显示"每页显示条数"
+            showRowsInfo:true, //是否显示记录信息
+
+            //每次切换页号，都会自动触发该函数
+            onChangePage: function(event,pageObj) { // returns page_num and rows_per_page after a link has clicked
+              pageFilterImpl(pageObj.currentPage,pageObj.rowsPerPage);
+            }
+          });
+        }
+      });
+    }
+
+    //filter
+  function sw_scFunc(){
+    var sw_origin  = document.getElementById("swFilter");
+    var sw = sw_origin.options[sw_origin.selectedIndex].text;
+
+    syncWay = sw
+    var sc_origin  = document.getElementById("scFilter");
+    var sc = sc_origin.options[sc_origin.selectedIndex].text;
+    scheduleCycle = sc
+
+    pageFilterImpl(1,$("#info_details").bs_pagination('getOption', 'rowsPerPage'));
+    index_left = 0;
+    index_right = 0;
+  }
+
+  function syncWayBindEdit(){
+
+    var sync_way_origin  = document.getElementById("edit-syncWay");
+    var sync_way = sync_way_origin.options[sync_way_origin.selectedIndex].text;
+
+    if (sync_way == 'binlog_insert') {
+      $("#edit-scheduleCycle").val('hour')
+    } else if (sync_way == 'hive_insert'){
+      $("#edit-scheduleCycle").val('day')
+    } else if (sync_way == 'hive_full'){
+      $("#edit-scheduleCycle").val('temp')
+    }
+  }
+
+    function syncWayBindInsert(){
+
+      var sync_way_origin  = document.getElementById("insert-syncWay");
+      var sync_way = sync_way_origin.options[sync_way_origin.selectedIndex].text;
+
+      if (sync_way == 'binlog_insert') {
+        $("#insert-scheduleCycle").val('hour')
+      } else if (sync_way == 'hive_insert'){
+        $("#insert-scheduleCycle").val('day')
+      } else if (sync_way == 'hive_full'){
+        $("#insert-scheduleCycle").val('temp')
+      }
+    }
+
+    function syncWayBindCopy(){
+
+      var sync_way_origin  = document.getElementById("copy-syncWay");
+      var sync_way = sync_way_origin.options[sync_way_origin.selectedIndex].text;
+
+      if (sync_way == 'binlog_insert') {
+        $("#copy-scheduleCycle").val('hour')
+      } else if (sync_way == 'hive_insert'){
+        $("#copy-scheduleCycle").val('day')
+      } else if (sync_way == 'hive_full'){
+        $("#copy-scheduleCycle").val('temp')
+      }
+    }
+
+
+    window.onload=function(){
+      pageFilterImpl(1,10);
+
+      //bindClass();
+
+      var dragging = false
+      var position = null
+
+      let drap = document.getElementById("insertConfig")
+
+      drap.addEventListener("mousedown", function (e) {
+        dragging = true
+        position = [e.clientX, e.clientY]
+      })
+      document.addEventListener('mousemove', function (e) {
+        if (dragging === false) {
+          return
+        }
+        let x = e.clientX
+        let y = e.clientY
+        let deltaX = x - position[0]
+        let deltaY = y - position[1]
+        let left = parseInt(drap.style.left || 100)
+        let top = parseInt(drap.style.top || 100)
+        drap.style.left = left + deltaX + 'px'
+        drap.style.top = top + deltaY + 'px'
+        position = [x, y]
+      })
+      document.addEventListener('mouseup', function (e) {
+        dragging = false
+      })
+
+    }
+
+  </script>
+</head>
+<body style="text-align:center;">
+
+<style type="text/css">
+
+  .button1 {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    padding: 16px 32px;
+    text-align: center;
+    background-color: white;
+    color: black;
+    border: 2px solid #4c77af;
+    border-radius:5px;
+  }
+  .button1:hover {
+    background-color: #4c77af;
+    color: white;
+  }
+  .button2 {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    padding: 8px 16px;
+    text-align: center;
+    background-color: white;
+    color: black;
+    border: 2px solid #4c77af;
+    border-radius:5px;
+  }
+  .button2:hover {
+    background-color: #4c77af;
+    color: white;
+  }
+
+  .button3 {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    padding: 8px 16px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.36);
+    color: black;
+    border: 2px solid #4c77af;
+    border-radius:5px;
+  }
+
+  .longText{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    width: 100px;
+  }
+
+  .longText:hover{
+    overflow:auto;
+    text-overflow:clip;
+  }
+
+</style>
+
+
+<!--更多信息-->
+<div class="modal fade" id="showConfigInfo" role="dialog">
+  <div class="modal-dialog" role="document" style="width: 85%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" >配置信息</h4>
+      </div>
+      <div class="modal-body">
+
+        <form class="form-horizontal" role="form">
+
+          <div class="form-group">
+            <label for="info-zgIp" class="col-sm-2 control-label">zgIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="info-zgIp">
+            </div>
+
+            <label for="info-proxyIp" class="col-sm-2 control-label">proxyIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="info-proxyIp">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="info-zijieyunIp" class="col-sm-2 control-label">zijieyunIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="info-zijieyunIp" value="2020-10-10">
+            </div>
+
+            <label for="info-createTime" class="col-sm-2 control-label">createTime</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="info-createTime" >
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="info-updateTime" class="col-sm-2 control-label">updateTime</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="info-updateTime" >
+            </div>
+
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <!-- <button type="button" class="btn btn-primary" id="saveEditActivityBtn">更新</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--编辑配置-->
+<div class="modal fade" id="editConfig" role="dialog">
+  <div class="modal-dialog" role="document" style="width: 85%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel2">配置信息</h4>
+      </div>
+      <div class="modal-body">
+
+        <form class="form-horizontal" role="form">
+
+          <div class="form-group">
+            
+            <label for="edit-confId" class="col-sm-2 control-label">配置信息ID</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="edit-confId" readonly = "">
+            </div>
+
+            <label for="edit-databaseName" class="col-sm-2 control-label">databaseName</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="edit-databaseName" >
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="edit-zgHdfsPath" class="col-sm-2 control-label">zgHdfsPath</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="edit-zgHdfsPath" >
+            </div>
+            
+            <label for="edit-syncWay" class="col-sm-2 control-label">syncWay</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <select class="form-control" id="edit-syncWay" onchange="syncWayBindEdit()">
+                <option>binlog_insert</option>
+                <option>hive_insert</option>
+                <option>hive_full</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            
+            <label for="edit-scheduleCycle" class="col-sm-2 control-label">scheduleCycle</label>
+            <div class="col-sm-10" style="width: 300px;">
+
+              <input type="text" class="form-control" id="edit-scheduleCycle" >
+<!--              <select class="form-control" id="edit-scheduleCycle">-->
+<!--                <option>hour</option>-->
+<!--                <option>day</option>-->
+<!--                <option>temp</option>-->
+<!--              </select>-->
+            </div>
+
+            <label for="edit-zijieyunHdfsPath" class="col-sm-2 control-label">zijieyunHdfsPath</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="edit-zijieyunHdfsPath" >
+            </div>
+          </div>
+
+          <div class="form-group">
+
+            <label for="edit-isDelete" class="col-sm-2 control-label">isDelete</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="edit-isDelete" >
+            </div>
+
+            <label for="edit-zgIp" class="col-sm-2 control-label">zgIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="edit-zgIp">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-proxyIp" class="col-sm-2 control-label">proxyIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="edit-proxyIp" value="nothing">
+            </div>
+
+            <label for="edit-zijieyunIp" class="col-sm-2 control-label">zijieyunIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="edit-zijieyunIp" value="nothing">
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" onclick="updateConfig()">更新</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <!-- <button type="button" class="btn btn-primary" id="saveEditActivityBtn">更新</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--编辑配置-->
+<div class="modal fade" id="copyConfig" role="dialog">
+  <div class="modal-dialog" role="document" style="width: 85%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title">配置信息</h4>
+      </div>
+      <div class="modal-body">
+
+        <form class="form-horizontal" role="form">
+
+          <div class="form-group">
+
+            <label for="copy-confId" class="col-sm-2 control-label">配置信息ID</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-confId" readonly = "">
+            </div>
+
+            <label for="copy-databaseName" class="col-sm-2 control-label">databaseName</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-databaseName" >
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="copy-zgHdfsPath" class="col-sm-2 control-label">zgHdfsPath</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-zgHdfsPath" >
+            </div>
+
+            <label for="copy-syncWay" class="col-sm-2 control-label">syncWay</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <select class="form-control" id="copy-syncWay" onchange="syncWayBindCopy()">
+                <option>binlog_insert</option>
+                <option>hive_insert</option>
+                <option>hive_full</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="copy-scheduleCycle" class="col-sm-2 control-label">scheduleCycle</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-scheduleCycle" >
+<!--              <select class="form-control" id="copy-scheduleCycle">-->
+<!--                <option>hour</option>-->
+<!--                <option>day</option>-->
+<!--                <option>temp</option>-->
+<!--              </select>-->
+            </div>
+
+            <label for="copy-zijieyunHdfsPath" class="col-sm-2 control-label">zijieyunHdfsPath</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-zijieyunHdfsPath" >
+            </div>
+          </div>
+
+          <div class="form-group">
+
+            <label for="copy-isDelete" class="col-sm-2 control-label">isDelete</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-isDelete" >
+            </div>
+
+            <label for="copy-zgIp" class="col-sm-2 control-label">zgIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-zgIp">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="copy-proxyIp" class="col-sm-2 control-label">proxyIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-proxyIp" value="nothing">
+            </div>
+
+            <label for="copy-zijieyunIp" class="col-sm-2 control-label">zijieyunIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="copy-zijieyunIp" value="nothing">
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" onclick="copyConfig()">插入数据</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <!-- <button type="button" class="btn btn-primary" id="saveEditActivityBtn">更新</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--新建任务-->
+<div class="modal fade" id="insertConfig" role="dialog">
+  <div class="modal-dialog" role="document" style="width: 85%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" >新增配置信息</h4>
+      </div>
+      <div class="modal-body">
+
+        <form class="form-horizontal" role="form">
+
+          <div class="form-group">
+            <label for="insert-databaseName" class="col-sm-2 control-label">databaseName</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="insert-databaseName" >
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="insert-zgHdfsPath" class="col-sm-2 control-label">zgHdfsPath</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="insert-zgHdfsPath" >
+            </div>
+
+            <label for="insert-syncWay" class="col-sm-2 control-label">syncWay</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <select class="form-control" id="insert-syncWay" onchange="syncWayBindInsert()">
+                <option>binlog_insert</option>
+                <option>hive_insert</option>
+                <option>hive_full</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="insert-scheduleCycle" class="col-sm-2 control-label">scheduleCycle</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="insert-scheduleCycle">
+<!--              <select class="form-control" id="insert-scheduleCycle">-->
+<!--                <option>hour</option>-->
+<!--                <option>day</option>-->
+<!--                <option>temp</option>-->
+<!--              </select>-->
+            </div>
+
+            <label for="insert-zijieyunHdfsPath" class="col-sm-2 control-label">zijieyunHdfsPath</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="insert-zijieyunHdfsPath" >
+            </div>
+          </div>
+
+          <div class="form-group">
+
+            <label for="insert-isDelete" class="col-sm-2 control-label">isDelete</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="insert-isDelete" >
+            </div>
+
+            <label for="insert-zgIp" class="col-sm-2 control-label">zgIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="insert-zgIp">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="insert-proxyIp" class="col-sm-2 control-label">proxyIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="insert-proxyIp" value="nothing">
+            </div>
+
+            <label for="insert-zijieyunIp" class="col-sm-2 control-label">zijieyunIp</label>
+            <div class="col-sm-10" style="width: 300px;">
+              <input type="text" class="form-control" id="insert-zijieyunIp" value="nothing">
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" onclick="insertNew()">新增</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <!-- <button type="button" class="btn btn-primary" id="saveEditActivityBtn">更新</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+
+  <div style="position: relative; left: 10px; top: -10px;">
+    <div class="page-header" >
+      <h3>离线同步配置表</h3>
+<!--      <button type="button" class="btn btn-primary" >test</button>-->
+    </div>
+  </div>
+
+</div>
+
+<div style="position: relative;top: 10px;">
+  <table class="table table-hover" style="table-layout: fixed;word-break: break-all;">
+<!--  <table class="table table-hover" style="table-layout: fixed; white-space: nowrap;text-overflow: ellipsis;overflow: hidden">-->
+
+  <thead>
+    <tr style="color: #B3B3B3; font-size: 20px">
+      <td>id</td>
+      <td>database</td>
+      <td>zg_hdfs_path</td>
+      <td>sync_way
+        <select id="swFilter" onchange="sw_scFunc()">
+          <option></option>
+          <option>binlog_insert</option>
+          <option>hive_insert</option>
+          <option>hive_full</option>
+        </select>
+      </td>
+      <td>schedule_cycle
+        <select id="scFilter" onchange="sw_scFunc()">
+          <option></option>
+          <option>hour</option>
+          <option>day</option>
+          <option>temp</option>
+        </select>
+      </td>
+      <td>zijieyun_hdfs_path</td>
+      <td>is_delete</td>
+    </tr>
+    </thead>
+    <tbody id="tBody" style="font-size: 20px;">
+    </tbody>
+  </table>
+
+
+  <div id="info_details"></div>
+</div >
+
+<!--<div style="position: relative;top: 10px; width: 20%;float: left">-->
+<!--  <table class="table table-hover" style="table-layout: fixed;word-break: break-all">-->
+<!--    <thead>-->
+<!--    <tr style="color: #B3B3B3; font-size: 20px">-->
+<!--      <td>操控台</td>-->
+<!--    </tr>-->
+<!--    </thead>-->
+<!--    <tbody id="tBody2" style="font-size: 15px;">-->
+<!--    </tbody>-->
+<!--  </table>-->
+<!--</div>-->
+</body>
+</html>

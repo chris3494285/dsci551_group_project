@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>任务调度列表</title>
+<!--  <script type="text/javascript"  src="js/jquery-1.7.2.min.js"></script>-->
+
+  <script type="text/javascript" src="js/jquery-1.11.1-min.js"></script>
+
+
+
+  <link rel="stylesheet" type="text/css" href="jquery/bootstrap_3.3.0/css/style.css">
+
+
+<!--  分页插件-->
+
+  <script type="text/javascript">
+    function login() {
+      //获取用户输入的表单信息
+      var userId = $.trim($("#userId").val());
+      var loginPassword = $.trim($("#loginPassword").val());
+
+        $.ajax({
+          url:"/offline-sync/controller/login/verification",
+
+          type:"post",
+          data:{
+            "userId":userId,
+            "loginPassword":loginPassword
+          },
+          success:function (jsonObject) {
+
+            if (jsonObject.errorMsg == "OK") {
+
+              var linkHost = window.location.host
+              window.location.href = "http://" + linkHost +"/offline-sync/controller/config.html";
+              //window.location.href = "http://localhost:8080/offline-sync/controller/config.html"
+
+            } else {
+             window.alert(jsonObject.errorMsg)
+            }
+
+          },
+          error:function () {
+            window.alert("系统繁忙，请稍后重试...")
+          }
+        });
+      //}
+
+    }
+
+  </script>
+</head>
+<body style="text-align:center;">
+
+<style type="text/css">
+
+  .main{
+    text-align: center; /*让div内部文字居中*/
+    border-radius: 20px;
+    width: 300px;
+    height: 350px;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+</style>
+
+
+<div class="main">
+
+
+  <div class="login-cnt clearfix">
+    <div class="login-form">
+      <h2>用户登录</h2>
+
+      <div class="login-box clearfix"style="z-index:8; padding-bottom:0px;">
+        <label>用户ID</label>
+        <input id="userId" name="userId" type="text" class="input_text" placeholder="输入用户ID" />
+      </div>
+
+
+      <div class="login-box clearfix" style="z-index:8; padding-bottom:0px;">
+        <label>密码</label>
+        <input id="loginPassword" name="loginPassword" type="password" placeholder="请输入登录密码" class="input_text" />
+      </div>
+
+
+      <div class="bn-login" id="loginId"><button onclick="login()">登录</button></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
