@@ -26,9 +26,9 @@ public interface MysqlMapper {
             @Result(property = "parentPath", column = "parent_path")})
     DirectoryConfig getDirectoryConfigById(int id);
 
-    @Select("select * from directory_info where cur_path = #{curPath}")
+    @Select("select * from directory_info where cur_path = #{curPath} and parent_path = #{parentPath}")
     @Results({@Result(property = "id", column = "id"),
             @Result(property = "curPath", column = "cur_path"),
             @Result(property = "parentPath", column = "parent_path")})
-    DirectoryConfig getDirectoryConfigByCurPath(String curPath);
+    DirectoryConfig getDirectoryConfigByCurPath(String curPath, String parentPath);
 }

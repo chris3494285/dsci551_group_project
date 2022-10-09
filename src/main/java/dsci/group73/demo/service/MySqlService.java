@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public interface MySqlService {
 
-    DirectoryConfig getDirectoryConfigByCurPath(String curPath);
+    DirectoryConfig getDirectoryConfigByCurPath(String curPath, String parentPath);
 
     int insertDirectoryConfig(DirectoryConfig directoryConfig);
 }

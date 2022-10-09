@@ -17,8 +17,8 @@ public class MySqlServiceImpl implements MySqlService {
 
 
     @Override
-    public DirectoryConfig getDirectoryConfigByCurPath(String curPath) {
-        DirectoryConfig directoryConfigByCurPath = mysqlConnector.getDirectoryConfigByCurPath(curPath);
+    public DirectoryConfig getDirectoryConfigByCurPath(String curPath,String parentPath) {
+        DirectoryConfig directoryConfigByCurPath = mysqlConnector.getDirectoryConfigByCurPath(curPath, parentPath);
         return directoryConfigByCurPath;
     }
 
