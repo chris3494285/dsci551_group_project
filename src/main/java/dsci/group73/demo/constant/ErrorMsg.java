@@ -16,4 +16,10 @@ public class ErrorMsg {
 
     public final static String EDFS_DIRECTORY_INSERT_ERROR= "Fail to insert into directory table";
 
+    public final static Integer ERROR_MSG_CODE_04 = 4;
+    public final static String COMMAND_PATH_ALREADY_EXISTED = "Input path existed";
+
+    public final static Integer ERROR_MSG_CODE_05 = 5;
+    public final static String COMMAND_REMOVE_TARGET_FILE_NOT_FOUND = "Input path existed";
+
 }

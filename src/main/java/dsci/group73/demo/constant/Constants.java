@@ -10,4 +10,8 @@ public class Constants {
     public static final String EDFS_READ_PARTITION = "readPartition";
 
     public static final String EDFS_MADIR_SUCCESS = "Make directory success";
+    public static final String EDFS_REMOVE_FILE_SUCCESS = "Remove file success";
+
+    public static final String EDFS_ROOT_PATH = "root";
+    public static final int EDFS_ROOT_ID = 1;
 }

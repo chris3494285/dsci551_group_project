@@ -17,14 +17,38 @@ public class MySqlServiceImpl implements MySqlService {
 
 
     @Override
-    public DirectoryConfig getDirectoryConfigByCurPath(String curPath,String parentPath) {
-        DirectoryConfig directoryConfigByCurPath = mysqlConnector.getDirectoryConfigByCurPath(curPath, parentPath);
-        return directoryConfigByCurPath;
+    public List<DirectoryConfig> queryChildDirectories(int parentNodeId) {
+        List<DirectoryConfig> childDirectoryConfigs = mysqlConnector.getChildDirectoriesByParentId(parentNodeId);
+        return childDirectoryConfigs;
     }
 
     @Override
-    public int insertDirectoryConfig(DirectoryConfig directoryConfig) {
-        int count = mysqlConnector.insertDirectory(directoryConfig);
-        return count;
+    public int insertDirectoryInfo(DirectoryConfig dc) {
+        int effectRow = mysqlConnector.insertDirectoryInfo(dc);
+        return effectRow;
+    }
+
+    @Override
+    public int queryNodeIdByParentIdAndCurPath(int parentId, String curPath) {
+        int id = mysqlConnector.getDirectoryIdByParentIdAndPath(parentId, curPath);
+        return id;
+    }
+
+    @Override
+    public List<PartitionConfig> queryPartitions(int directory_id) {
+        List<PartitionConfig> partitionFiles = mysqlConnector.getPartitionFiles(directory_id);
+        return partitionFiles;
+    }
+
+    @Override
+    public int removePartitionsByFileName(String fileName) {
+        int effectRows = mysqlConnector.removePartitionByFileName(fileName);
+        return  effectRows;
+    }
+
+    @Override
+    public List<Integer> queryPartitionsLocations(String fileName) {
+        List<Integer> partitionLocations = mysqlConnector.getPartitionLocations(fileName);
+        return partitionLocations;
     }
 }

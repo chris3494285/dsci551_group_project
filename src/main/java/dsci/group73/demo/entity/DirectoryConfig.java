@@ -3,15 +3,15 @@ package dsci.group73.demo.entity;
 public class DirectoryConfig {
     private int id;
     private String curPath;
-    private String parentPath;
+    private int parentNodeId;
 
     public DirectoryConfig() {
     }
 
-    public DirectoryConfig(int id, String curPath, String parentPath) {
+    public DirectoryConfig(int id, String curPath, int parentNodeId) {
         this.id = id;
         this.curPath = curPath;
-        this.parentPath = parentPath;
+        this.parentNodeId = parentNodeId;
     }
 
     public int getId() {
@@ -30,11 +30,11 @@ public class DirectoryConfig {
         this.curPath = curPath;
     }
 
-    public String getParentPath() {
-        return parentPath;
+    public int getParentNodeId() {
+        return parentNodeId;
     }
 
-    public void setParentPath(String parentPath) {
-        this.parentPath = parentPath;
+    public void setParentNodeId(int parentNodeId) {
+        this.parentNodeId = parentNodeId;
     }
 }

@@ -17,18 +17,24 @@ public interface MysqlMapper {
             @Result(property = "partitionName", column = "partition_name")})
     List<PartitionConfig> getPartitionFiles(int directoryId);
 
-    @Insert("insert into directory_info (cur_path, parent_path) values (#{directoryConfig.curPath}, #{directoryConfig.parentPath})")
-    int insertDirectory(@Param("directoryConfig") DirectoryConfig directoryConfig);
+    @Select("select distinct directory_id from file_info where file_name = #{fileName}")
+    @Results({@Result(property = "id", column = "id"),@Result(property = "directoryId", column = "directory_id"),
+            @Result(property = "filePath", column = "file_path"),@Result(property = "fileName", column = "file_name"),
+            @Result(property = "partitionName", column = "partition_name")})
+    List<Integer> getPartitionLocations(String fileName);
 
-    @Select("select * from directory_info where id = #{id}")
-    @Results({@Result(property = "id", column = "id"),
-            @Result(property = "curPath", column = "cur_path"),
-            @Result(property = "parentPath", column = "parent_path")})
-    DirectoryConfig getDirectoryConfigById(int id);
 
-    @Select("select * from directory_info where cur_path = #{curPath} and parent_path = #{parentPath}")
-    @Results({@Result(property = "id", column = "id"),
-            @Result(property = "curPath", column = "cur_path"),
-            @Result(property = "parentPath", column = "parent_path")})
-    DirectoryConfig getDirectoryConfigByCurPath(String curPath, String parentPath);
+    @Select("select * from directory_info where parent_node_id = #{parentId}")
+    @Results({@Result(property = "id", column = "id"),@Result(property = "curPath", column = "cur_path"),
+            @Result(property = "parentNodeId", column = "parent_node_id")})
+    List<DirectoryConfig> getChildDirectoriesByParentId(int parentId);
+
+    @Insert("insert into directory_info (cur_path, parent_node_id) values (#{directoryConfig.curPath}, #{directoryConfig.parentNodeId})")
+    int insertDirectoryInfo(DirectoryConfig directoryConfig);
+
+    @Select("select id from directory_info where parent_node_id = #{parentId} and cur_path = curPath")
+    int getDirectoryIdByParentIdAndPath(int parentId, String curPath);
+
+    @Select("delete from file_info where file_path = #{fileName}")
+    int removePartitionByFileName(String fileName);
 }

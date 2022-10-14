@@ -9,7 +9,16 @@ import java.util.List;
 @Service
 public interface MySqlService {
 
-    DirectoryConfig getDirectoryConfigByCurPath(String curPath, String parentPath);
+    List<DirectoryConfig> queryChildDirectories(int parentNodeId);
 
-    int insertDirectoryConfig(DirectoryConfig directoryConfig);
+    int insertDirectoryInfo(DirectoryConfig dc);
+
+    int queryNodeIdByParentIdAndCurPath(int parentId, String curPath);
+
+    List<PartitionConfig> queryPartitions(int directory_id);
+
+    int removePartitionsByFileName(String fileName);
+
+
+    List<Integer> queryPartitionsLocations(String fileName);
 }
